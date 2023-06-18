@@ -212,12 +212,29 @@ public class field : MonoBehaviour
 
     }
 
+    public void autoSafeAllCreatures(){
+        List<CreatureClass> allCreaturesCopy = new List<CreatureClass>(allCreatures);
+        GenomeStruct[][] allCreaturesSafed = new GenomeStruct[allCreaturesCopy.Count][];
+        BinaryFormatter formatter = new BinaryFormatter();
+        int count2 = 0;
+        
+        foreach (CreatureClass cre in allCreaturesCopy)
+            {
+                allCreaturesSafed[count2] = cre.brainGenomes;
+                count2++;
+            }
+        using (FileStream stream = new FileStream("autoSafe.dat", FileMode.Create))
+        {
+            
+                formatter.Serialize(stream, allCreaturesSafed);
+        }
+    }
     public void safeAllCreatures(){
         List<CreatureClass> allCreaturesCopy = new List<CreatureClass>(allCreatures);
         GenomeStruct[][] allCreaturesSafed = new GenomeStruct[allCreaturesCopy.Count][];
         BinaryFormatter formatter = new BinaryFormatter();
         int count2 = 0;
-
+        
         foreach (CreatureClass cre in allCreaturesCopy)
             {
                 allCreaturesSafed[count2] = cre.brainGenomes;
@@ -258,6 +275,10 @@ public class field : MonoBehaviour
         }
 
     }}
+
+    private void Start() {
+        InvokeRepeating("autoSafeAllCreatures", 60f, 300f);
+    }
 
     
 }
