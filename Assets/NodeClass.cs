@@ -20,8 +20,10 @@ public class NodeClass
     Dictionary<int, float> startPullDictonary;//source,weight
     Dictionary<int, float> endPushDictonary;//target,weight
 
+    int function = 0; //0 = Sigmoid 1 = 
 
-    public NodeClass(bool _isInput, bool _isConnector, NodeClass[] _internalNodes, float[] _globalInputs, float[] _globalOutputs, float _bias)
+
+    public NodeClass(bool _isInput, bool _isConnector, NodeClass[] _internalNodes, float[] _globalInputs, float[] _globalOutputs, float _bias,int _function)
     {
         this.isInput = _isInput;
         this.isConnector = _isConnector;
@@ -32,6 +34,7 @@ public class NodeClass
         startPullDictonary = new Dictionary<int, float>();
         endPushDictonary = new Dictionary<int, float>();
         this.bias = _bias;
+        this.function = _function;
     }
         public NodeClass(bool _isConnector, float[] _globalInputs, float[] _globalOutputs, float _connectorWeight, int _connectorSource, int _connectorTarget)
     {
@@ -57,7 +60,7 @@ public class NodeClass
         if (!isConnector)
         {
             
-           output = (float)(1.0 / (1.0 + Math.Exp(-input)));
+           output = Funcion(input,function);
            foreach (KeyValuePair<int, float> connection in connectionDictonary)
             {
                 
@@ -101,18 +104,63 @@ public class NodeClass
     }
 
     public void addConnectionEnd(int target,float weight){
+        if (endPushDictonary.ContainsKey(target)){
+            return;
+        }
         endPushDictonary.Add(target,weight);
     }
     public void addConnectionMiddel(int target,float weight){
+        if (connectionDictonary.ContainsKey(target)){
+            return;
+        }
         connectionDictonary.Add(target,weight);
     }
     public void addConnectionStart(int source,float weight){
+        if (startPullDictonary.ContainsKey(source)){
+            return;
+        }
         startPullDictonary.Add(source,weight);
     }
 
     public void changeBias(float amount){
         bias += amount;
     }
+
+    float Funcion(float input, int function)
+{
+    switch (function)
+    {
+        case 1:
+            return (float)(1.0 / (1.0 + Math.Exp(-input)));
+
+        case 2:
+            // ReLU function
+            return Math.Max(0, input);
+
+        case 3:
+            // Leaky ReLU function
+            const float leakyFactor = 0.01f;
+            return input >= 0 ? input : leakyFactor * input;
+
+        case 4:
+            // Hyperbolic Tangent (tanh) function
+            return (float)Math.Tanh(input);
+
+        case 5:
+            // Binary Step function
+            return input >= 0 ? 1 : 0;
+
+        
+
+        // Add more cases as needed for additional functions
+        default:
+
+            return Math.Max(0, input);
+    }
+
+    // Return a default value or handle an invalid function number
+    throw new ArgumentException("Invalid function number.");
+}
 
 
 

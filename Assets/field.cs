@@ -2,19 +2,21 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
+
 public class field : MonoBehaviour
 {
-    public static int Size = 1000;
+    public static int Size = 1500;
 
     private static System.Random random = new System.Random();
 
     public static EntityClass[,] gameboard = new EntityClass[Size,Size];
     
     public static int plantCount = 0;
-    public static int plantWishCount = 2000;
-    
+    public static int plantWishCount = 5000;
     public static int CreatureCount = 0;
-    public static int CreatureWishCount = 4000;
+    public static int CreatureWishCount = 2000;
 
     public static List<CreatureClass> allCreatures  = new List<CreatureClass>();
     
@@ -44,8 +46,8 @@ public class field : MonoBehaviour
         }
     }
 
-      /*  public static void spawnCreature(GenomeStruct[] DNA){
-        if (CreatureCount>CreatureWishCount+200)
+        public static void spawnCreature(GenomeStruct[] DNA){
+        if (CreatureCount>CreatureWishCount+2000)
         {
             return;
         }
@@ -59,7 +61,7 @@ public class field : MonoBehaviour
             allCreatures.Add(a);
             return;
         }
-    } */
+    } 
 
     public static void spawnCreatureMuated(GenomeStruct[] DNA){
         if (CreatureCount>CreatureWishCount+300)
@@ -212,21 +214,50 @@ public class field : MonoBehaviour
 
     public void safeAllCreatures(){
         List<CreatureClass> allCreaturesCopy = new List<CreatureClass>(allCreatures);
+        GenomeStruct[][] allCreaturesSafed = new GenomeStruct[allCreaturesCopy.Count][];
         BinaryFormatter formatter = new BinaryFormatter();
+        int count2 = 0;
+
+        foreach (CreatureClass cre in allCreaturesCopy)
+            {
+                allCreaturesSafed[count2] = cre.brainGenomes;
+                count2++;
+            }
         using (FileStream stream = new FileStream("genArrayCopy.dat", FileMode.Create))
         {
-            foreach (CreatureClass cre in allCreaturesCopy)
-            {
-                formatter.Serialize(stream, cre.brainGenomes);
-            }
             
+                formatter.Serialize(stream, allCreaturesSafed);
         }
+            
+            
+        
     }
 
+    public void loadAllCreaturesFromSafe(){
+        string fileName = "genArrayCopy.dat";
+        GenomeStruct[][] loadedArray;
+    // Check if the file exists before attempting to load it
+    if (File.Exists(fileName))
+    {
+        // Create a BinaryFormatter instance
+        BinaryFormatter formatter = new BinaryFormatter();
 
+        // Open the file stream for reading
+        using (FileStream stream = new FileStream(fileName, FileMode.Open))
+        {
+            
+            // Deserialize the data and cast it back to the appropriate type
+            loadedArray = (GenomeStruct[][])formatter.Deserialize(stream);
 
+            // Use the loaded data as needed
+            // ...
+        }
+        foreach (GenomeStruct[] RNA in loadedArray)
+        {
+            spawnCreature(RNA);
+        }
 
-    
+    }}
 
     
 }

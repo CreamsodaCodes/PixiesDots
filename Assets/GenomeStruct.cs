@@ -15,9 +15,11 @@ public struct GenomeStruct
     public float red;
     public float green;
     public float blue;
+
+    public int WhatFunction;
     
     // Struct constructor
-    public GenomeStruct(bool source, bool sink, byte sourceId, byte targetId, float weight, float bias,float r,float g,float b)
+    public GenomeStruct(bool source, bool sink, byte sourceId, byte targetId, float weight, float bias,float r,float g,float b,int whatFunctio)
     {
         this.source = source;
         this.sink = sink;
@@ -26,8 +28,9 @@ public struct GenomeStruct
         this.weight = weight;
         this.bias = bias;
         this.red = r;
-        blue = b;
-        green = g;
+        this.blue = b;
+        this.green = g;
+        this.WhatFunction = whatFunctio;
     }
 
     public GenomeStruct(bool genRandom)
@@ -42,10 +45,11 @@ public struct GenomeStruct
         red = (float)random.NextDouble();
         green = (float)random.NextDouble();
         blue = (float)random.NextDouble();
+        WhatFunction = random.Next(6);
 
     }
     public GenomeStruct CloneMe(){
-        return new GenomeStruct(source,sink,sourceId,targetId,weight,bias,red,green,blue);
+        return new GenomeStruct(source,sink,sourceId,targetId,weight,bias,red,green,blue,WhatFunction);
     }
 
     public void randomGen(){
@@ -68,7 +72,7 @@ public struct GenomeStruct
         if (mutator==1)
         {
             this.source = !source;
-            this.sink = !sink;
+            
 
         }
         if (mutator==2)
@@ -130,6 +134,14 @@ public struct GenomeStruct
             {
                 this.green += change;
             }
+        }
+        if (61<mutator&&mutator<65)
+        {
+           int rnumber = random.Next(3)-1;
+           if (WhatFunction + rnumber >= 0 && WhatFunction + rnumber <6)
+           {
+            WhatFunction += rnumber;
+           }
         }
     }
 }

@@ -63,4 +63,9 @@ public class EntityClass
         GameObject.Destroy(spawnedPrefab);
     }
     public virtual void killMe(){}
+
+    public void grow(){
+    spawnedPrefab.transform.localScale = new Vector3(2f, 2f, 1f);    }
+    public void shrink(){
+    spawnedPrefab.transform.localScale = new Vector3(0.9f, 0.9f, 1f);    }
 }

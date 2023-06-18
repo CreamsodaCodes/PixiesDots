@@ -7,16 +7,20 @@ public class CreatureClass: EntityClass
     
     public NodeClass[] allInternalNodes;
     public GenomeStruct[] brainGenomes;
-     List<NodeClass> connectorNodes; //remove public after test!
+     List<NodeClass> connectorNodes; 
     int maxRepititionsPerThink = 10;
      public float[] globalInputs;
      public float[] globalOutputs;
     //converted
     int food = 4000;
     
+    int baseHunger = 10;
     // new not yet mutation variables:
-    int visionLength = 10;
+    int visionLength = 12;
+    int noseQuality = 7;
 
+    int periodenDauerClock = 5;
+    bool isInEatMode = false;
 
 
     public CreatureClass(int _xCord,int _yCord,GenomeStruct[] _brainGenomes): base( _xCord, _yCord){
@@ -75,7 +79,7 @@ public class CreatureClass: EntityClass
             {
                 if (allInternalNodes[Genome.sourceId] == null)
                 {
-                    allInternalNodes[Genome.sourceId] = new NodeClass(false,false,allInternalNodes,globalInputs,globalOutputs,Genome.bias);
+                    allInternalNodes[Genome.sourceId] = new NodeClass(false,false,allInternalNodes,globalInputs,globalOutputs,Genome.bias,Genome.WhatFunction);
                     allInternalNodes[Genome.sourceId].addConnectionEnd(Genome.targetId,Genome.weight);
                     validTargetIDs.Add(Genome.sourceId);
                 }
@@ -104,7 +108,7 @@ public class CreatureClass: EntityClass
                     {
                         if (allInternalNodes[Genome.sourceId]==null)
                         {
-                            allInternalNodes[Genome.sourceId]= new NodeClass(false,false,allInternalNodes,globalInputs,globalOutputs,Genome.bias);
+                            allInternalNodes[Genome.sourceId]= new NodeClass(false,false,allInternalNodes,globalInputs,globalOutputs,Genome.bias,Genome.WhatFunction);
                             allInternalNodes[Genome.sourceId].addConnectionMiddel(Genome.targetId,Genome.weight);
                             validTargetIDs2.Add(Genome.sourceId);
                             deleteThose.Add(Genome);
@@ -177,7 +181,7 @@ public class CreatureClass: EntityClass
         inputManager();
         think();
         moveDecicion();
-        food -= brainGenomes.Count();
+        food -= brainGenomes.Count()+baseHunger;
         
         if (food<=0)
         {
@@ -238,7 +242,14 @@ public class CreatureClass: EntityClass
         int check = checkField(xCord-1,yCord);
         if (check == 1)
         {
-            eatCreature(xCord-1,yCord);
+            if (isInEatMode)
+            {
+                eatCreature(xCord-1,yCord);
+            }
+            else
+            {
+                return;
+            }
         }
         if (check == 2)
         {
@@ -258,7 +269,14 @@ public class CreatureClass: EntityClass
         int check = checkField(xCord+1,yCord);
         if (check == 1)
         {
-            eatCreature(xCord+1,yCord);
+            if (isInEatMode)
+            {
+                eatCreature(xCord+1,yCord);
+            }
+            else
+            {
+                return;
+            }
         }
         if (check == 2)
         {
@@ -278,7 +296,14 @@ public class CreatureClass: EntityClass
         int check = checkField(xCord,yCord+1);
         if (check == 1)
         {
-            eatCreature(xCord,yCord+1);
+            if (isInEatMode)
+            {
+                eatCreature(xCord,yCord+1);
+            }
+            else
+            {
+                return;
+            }
         }
         if (check == 2)
         {
@@ -297,7 +322,15 @@ public class CreatureClass: EntityClass
         int check = checkField(xCord,yCord-1);
         if (check == 1)
         {
-            eatCreature(xCord,yCord-1);
+            if (isInEatMode)
+            {
+                eatCreature(xCord,yCord-1);
+            }
+            else
+            {
+                return;
+            }
+            
         }
         if (check == 2)
         {
@@ -336,6 +369,9 @@ public class CreatureClass: EntityClass
         case 5:
             giveBirth();
             break;
+        case 6:
+            changeEatMode();
+            break;
         
         // Add more cases as needed for additional output neurons
         default:
@@ -343,6 +379,7 @@ public class CreatureClass: EntityClass
     }
     }
 bool clock1hz = true;
+int clock = 0;
     void inputManager(){
         resetinputs();
         globalInputs[0] = VisualCortex.GetLineFields(xCord,yCord,visionLength,1,1); //creatures north
@@ -374,8 +411,36 @@ bool clock1hz = true;
         globalInputs[18] = VisualCortex.GetLineFields(xCord,yCord,visionLength*4,2,2); //plants easr
         globalInputs[19] = VisualCortex.GetLineFields(xCord,yCord,visionLength*4,2,3); //plants south
         globalInputs[20] = VisualCortex.GetLineFields(xCord,yCord,visionLength*4,2,4);
-        globalInputs[21] = Nose.smell(xCord,yCord,4,1);
-        globalInputs[22] = Nose.smell(xCord,yCord,4,2);
+        globalInputs[21] = Nose.smell(xCord,yCord,2,1);
+        globalInputs[22] = Nose.smell(xCord,yCord,2,2);
+        globalInputs[23] = Nose.smell(xCord,yCord,noseQuality,1);
+        globalInputs[24] = Nose.smell(xCord,yCord,noseQuality,2);
+        globalInputs[25] =(float) xCord/field.Size;     //Distance to borders
+        globalInputs[26] =1f/xCord;
+        globalInputs[27] =(float) yCord/field.Size;
+        globalInputs[28] =1f/yCord;
+        globalInputs[29] = (float)((field.Size*0.5f) - xCord) + ((field.Size*0.5f) - yCord); //Distance to middel 
+        globalInputs[30] = (float) Math.Abs(globalInputs[29]); //Distance to middel absolute
+        globalInputs[31] = 1f/food; //hunger
+        if (clock == periodenDauerClock)
+        {
+            clock = 0;
+            globalInputs[32] = 11f;
+        }
+        else{
+            clock++;
+            globalInputs[32] = -11f;
+        }
+        if (globalOutputs[0] > 0)
+        {
+            globalInputs[33] = 1f;
+        }
+        else{
+            clock++;
+            globalInputs[33] = -1f;
+        }
+
+
     }
 
     
@@ -384,7 +449,7 @@ public int GetMaxIndexFirst5()
     int maxIndex = 0;
     float maxValue = globalOutputs[0];
 
-    for (int i = 1; i < 5; i++)
+    for (int i = 1; i < 7; i++)
     {
         if (globalOutputs[i] > maxValue)
         {
@@ -394,6 +459,21 @@ public int GetMaxIndexFirst5()
     }
 
     return maxIndex;
+}
+
+void changeEatMode(){
+    if (isInEatMode)
+    {
+        isInEatMode = false;
+        baseHunger = (int) ((float)(baseHunger)*0.5f);
+        shrink();
+    }
+    else
+    {
+        isInEatMode = true;
+        baseHunger = (int) baseHunger*2;
+        grow();
+    }
 }
 
 
