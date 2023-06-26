@@ -14,13 +14,14 @@ public class field : MonoBehaviour
     public static EntityClass[,] gameboard = new EntityClass[Size,Size];
     
     public static int plantCount = 0;
-    public static int plantWishCount = 5000;
+    public static int plantWishCount = 7000;
     public static int CreatureCount = 0;
-    public static int CreatureWishCount = 2000;
+    public static int CreatureWishCount = 4000;
 
     public static List<CreatureClass> allCreatures  = new List<CreatureClass>();
     
-
+    public static Dictionary<Tuple<int, int>, HormoneClass> allHormones = new Dictionary<Tuple<int, int>, HormoneClass>();
+    public static Dictionary<Tuple<int, int>, HormoneClass> allHormonesCopy;
 
     
     void keepCreaturesAtWish(){
@@ -64,7 +65,7 @@ public class field : MonoBehaviour
     } 
 
     public static void spawnCreatureMuated(GenomeStruct[] DNA){
-        if (CreatureCount>CreatureWishCount+300)
+        if (CreatureCount>CreatureWishCount+1000)
         {
             return;
         }
@@ -154,6 +155,98 @@ public class field : MonoBehaviour
 
         
     }
+
+    public static void spawnCreatureMuatedNear(GenomeStruct[] DNA, int xCord,int yCord){
+        if (CreatureCount>CreatureWishCount+1100)
+        {
+            return;
+        }
+        GenomeStruct[] DNACopy2;
+        GenomeStruct[] DNACopy = new GenomeStruct[DNA.Length];
+        int k = 0;
+        foreach (GenomeStruct clone in DNA)
+        {
+
+            DNACopy[k] = clone.CloneMe();
+            DNACopy[k].mutateMe();
+
+            k++;
+        }
+        if(random.Next(2) == 0)
+        {   if (DNA.Length >= 255)
+            {
+                DNACopy2 = new GenomeStruct[DNA.Length];
+            }
+            else
+            {
+                DNACopy2 = new GenomeStruct[DNA.Length+1];
+                DNACopy2[DNA.Length] = new GenomeStruct(true);
+            }
+             
+            int i = 0;
+            foreach (GenomeStruct Gen in DNACopy)
+            {
+                Gen.mutateMe();
+                DNACopy2[i] = DNACopy[i].CloneMe();
+                
+                i++;
+            }
+            
+        }
+        else
+        {
+            int i;
+            if (DNA.Length == 1)
+            {
+                DNACopy2 = new GenomeStruct[DNA.Length];
+                i = 0;
+            }
+            else{
+
+                DNACopy2 = new GenomeStruct[DNA.Length-1];
+                i = -1;
+            }
+           
+            
+            foreach (GenomeStruct Gen in DNACopy)
+            {
+                Gen.mutateMe();
+                if (i>=0)
+                {
+                    DNACopy2[i] = DNACopy[i].CloneMe();
+                }
+                
+                
+                i++;
+            }
+             
+        }
+        
+        int rX = random.Next(20);
+        int rY = random.Next(20);
+        if (xCord+rX<Size&&yCord+rY<Size&&checkField(rX+xCord,rY+yCord)==0)
+        {
+            CreatureCount++;
+            CreatureClass a = new CreatureClass(xCord+rX,yCord+rY,DNACopy);
+            gameboard[rX,rY] = a;
+            allCreatures.Add(a);
+            
+        } 
+        
+        
+        
+        if (xCord+rX<Size&&yCord+rY<Size&&checkField(rY+yCord,rX+xCord)==0)
+        {
+            CreatureCount++;
+            CreatureClass a = new CreatureClass(yCord+rY,xCord+rX,DNACopy2);
+            gameboard[rY,rX] = a;
+            allCreatures.Add(a);
+            
+        } 
+        
+
+        
+    }
     
     
     void spawnPlant(){
@@ -196,6 +289,14 @@ public class field : MonoBehaviour
         {
            keepPlantsAtWish();
              
+        }
+        allHormonesCopy = new Dictionary<Tuple<int, int>, HormoneClass>(allHormones);
+        foreach (KeyValuePair<Tuple<int, int>, HormoneClass> hormone in allHormonesCopy)
+        {
+            /*if (hormone.value.runAndKillHormone)
+            {
+                allHormones.Remove(hormone.key);
+            }*/
         }
         
         List<CreatureClass> allCreaturesCopy = new List<CreatureClass>(allCreatures);

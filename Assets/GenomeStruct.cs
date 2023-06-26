@@ -15,12 +15,15 @@ public struct GenomeStruct
     public float red;
     public float green;
     public float blue;
-
+    int inputAmount; //40; //256
+    int outputAmount;
     public int WhatFunction;
     
     // Struct constructor
     public GenomeStruct(bool source, bool sink, byte sourceId, byte targetId, float weight, float bias,float r,float g,float b,int whatFunctio)
     {
+        this.inputAmount = 40;
+        this.outputAmount = 40;
         this.source = source;
         this.sink = sink;
         this.sourceId = sourceId;
@@ -35,11 +38,12 @@ public struct GenomeStruct
 
     public GenomeStruct(bool genRandom)
     {
-        
+        this.inputAmount = 40;
+         this.outputAmount = 40;
         source = random.Next(2) == 0;
         sink = random.Next(2) == 0;
-        sourceId = (byte)random.Next(256);
-        targetId = (byte)random.Next(256);
+        sourceId = (byte)random.Next(outputAmount);
+        targetId = (byte)random.Next(outputAmount);
         weight = (float)(random.NextDouble() * 7.0 - 3.5);
         bias  = (float)((random.NextDouble() * 0.02) - 0.01);
         red = (float)random.NextDouble();
@@ -57,8 +61,8 @@ public struct GenomeStruct
 
         source = random.Next(2) == 0;
         sink = random.Next(2) == 0;
-        sourceId = (byte)random.Next(256);
-        targetId = (byte)random.Next(256);
+        sourceId = (byte)random.Next(outputAmount);
+        targetId = (byte)random.Next(outputAmount);
         
         weight =(float) (random.NextDouble() * 7.0 - 3.5);
         bias  = (float)((random.NextDouble() * 0.02) - 0.01);
@@ -83,7 +87,7 @@ public struct GenomeStruct
         }
         if (2<mutator&&mutator<6)
         {
-            if(this.sourceId + randomInt>0){
+            if(this.sourceId + randomInt>0&&this.sourceId + randomInt<outputAmount+1){
                 this.sourceId += (byte)randomInt;
             }
             
@@ -91,7 +95,7 @@ public struct GenomeStruct
         }
         if (6<mutator&&mutator<11)
         {
-            if(this.targetId + randomInt>0){
+            if(this.targetId + randomInt>0&&this.targetId + randomInt<outputAmount+1){
                 this.targetId += (byte)randomInt;
             }
             
@@ -108,7 +112,7 @@ public struct GenomeStruct
         {
             this.bias += (float)((random.NextDouble() * 0.02) - 0.01);
         }
-        if (31<mutator&&mutator<41)
+        if (31<mutator&&mutator<36)
         {
             float change = (float)((random.NextDouble() * 0.2) - 0.1);
             if (this.red+change>0&&this.red+change<1)
@@ -117,7 +121,7 @@ public struct GenomeStruct
             }
             
         }
-        if (41<mutator&&mutator<51)
+        if (41<mutator&&mutator<50)
         {
             float change = (float)((random.NextDouble() * 0.2) - 0.1);
             if (this.blue+change>0&&this.blue+change<1)
@@ -127,7 +131,7 @@ public struct GenomeStruct
                 
             }
         }
-        if (51<mutator&&mutator<61)
+        if (51<mutator&&mutator<60)
         {
             float change = (float)((random.NextDouble() * 0.2) - 0.1);
             if (this.green+change>0&&this.green+change<1)

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-
 static class VisualCortex
 {
     static public float GetLineFields(int x, int y, int visionLength,int whatTag, int direction) //1 nord 2 ost ...
@@ -11,7 +10,6 @@ static class VisualCortex
             {
                 if (field.checkField(x+i,y)==whatTag)
                 {
-                    
                    return 1f/(float) Math.Sqrt(i);
                 }
             }

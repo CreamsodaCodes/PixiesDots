@@ -22,6 +22,8 @@ public class CreatureClass: EntityClass
     int periodenDauerClock = 5;
     bool isInEatMode = false;
 
+    int memory1Adress;
+    float memory1Value;
 
     public CreatureClass(int _xCord,int _yCord,GenomeStruct[] _brainGenomes): base( _xCord, _yCord){
         tag = 1;
@@ -218,9 +220,17 @@ public class CreatureClass: EntityClass
             return;
         }
         field.gameboard[xCord,yCord].deleteVisual();
-        food += 900;
+        food += 3000;
         field.plantCount--;
-        field.spawnCreatureMuated(brainGenomes);
+        if (UnityEngine.Random.Range(0,5) == 0)
+        {
+            field.spawnCreatureMuated(brainGenomes);
+        }
+        if (UnityEngine.Random.Range(0,5) == 0)
+        {
+            field.spawnCreature(brainGenomes);
+        }
+        
     }
 
     void eatCreature(int xCord,int yCord){
@@ -230,10 +240,16 @@ public class CreatureClass: EntityClass
         }
         field.gameboard[xCord,yCord].deleteVisual();
         field.gameboard[xCord,yCord].killMe();
-        food += 500;
+        food += 2000;
 
         
     }
+
+    void setMemory1(int adress,float value){
+        memory1Adress = adress;
+        memory1Value = value;
+    }
+
     void moveLeft(){
         if (xCord-1<0)
         {
@@ -341,19 +357,41 @@ public class CreatureClass: EntityClass
         field.gameboard[XCord,YCord] = this;
         updatePosition(xCord,yCord);
     }
+
+   void moveRandom(){
+        switch (UnityEngine.Random.Range(0, 5))
+    {
+        case 1:
+            moveDown();
+            break;
+        case 2:
+            moveUp();
+            break;
+        case 3:
+            moveLeft();
+            break;
+        case 4:
+            moveRight();
+            break;
+   }
+   }
+
     void giveBirth(){
-        if(food<3000){
+        if(food<4001){
             return;
         }
         food -= 3000;
         
-        field.spawnCreatureMuated(brainGenomes);
+        field.spawnCreatureMuatedNear(brainGenomes,xCord,yCord);
 
     }
 
     void moveDecicion(){
         switch (GetMaxIndexFirst5())
     {
+        case 0:
+            moveRandom();
+            break;
         case 1:
             moveDown();
             break;
@@ -370,18 +408,43 @@ public class CreatureClass: EntityClass
             giveBirth();
             break;
         case 6:
-            changeEatMode();
+            changeEatMode(true);
             break;
-        
+        case 7:
+            changeEatMode(false);
+            break;
+        case 8:
+            
+            
+            break;
+        case 9:
+            moveDown();
+            setMemory1(9,-2f);
+            break;
+        case 10:
+            moveUp();
+            setMemory1(10,-2f);
+            break;
+        case 11:
+            moveLeft();
+            setMemory1(11,-2f);
+            break;
+        case 12:
+            moveRight();
+            setMemory1(12,-2f);
+            break;
+
         // Add more cases as needed for additional output neurons
         default:
             break;
     }
     }
+
 bool clock1hz = true;
 int clock = 0;
     void inputManager(){
         resetinputs();
+        globalInputs[memory1Adress] = memory1Value;
         globalInputs[0] = VisualCortex.GetLineFields(xCord,yCord,visionLength,1,1); //creatures north
         globalInputs[1] = VisualCortex.GetLineFields(xCord,yCord,visionLength,1,2); //creatures easr
         globalInputs[2] = VisualCortex.GetLineFields(xCord,yCord,visionLength,1,3); //creatures south
@@ -439,6 +502,11 @@ int clock = 0;
             clock++;
             globalInputs[33] = -1f;
         }
+        globalInputs[34] = 1;
+        globalInputs[35] = -1;
+        globalInputs[36] = 11;
+        globalInputs[37] = -11;
+        globalInputs[38] = UnityEngine.Random.Range(-1, 2);
 
 
     }
@@ -449,7 +517,7 @@ public int GetMaxIndexFirst5()
     int maxIndex = 0;
     float maxValue = globalOutputs[0];
 
-    for (int i = 1; i < 7; i++)
+    for (int i = 1; i < 9; i++)
     {
         if (globalOutputs[i] > maxValue)
         {
@@ -461,14 +529,14 @@ public int GetMaxIndexFirst5()
     return maxIndex;
 }
 
-void changeEatMode(){
-    if (isInEatMode)
+void changeEatMode(bool activte){
+    if (!activte&&isInEatMode)
     {
         isInEatMode = false;
         baseHunger = (int) ((float)(baseHunger)*0.5f);
         shrink();
     }
-    else
+    else if(activte&&!isInEatMode)
     {
         isInEatMode = true;
         baseHunger = (int) baseHunger*2;
