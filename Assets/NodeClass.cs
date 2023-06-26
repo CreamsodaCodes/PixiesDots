@@ -64,7 +64,7 @@ public class NodeClass
            foreach (KeyValuePair<int, float> connection in connectionDictonary)
             {
                 
-                if (connection.Key>255)
+                if (connection.Key>41) //255
                 {
                     Debug.Log("Connection internal Key bigger than 255");
                 }
@@ -75,7 +75,7 @@ public class NodeClass
             foreach (KeyValuePair<int, float> connection in endPushDictonary)
             {
                 //Debug
-                if (connection.Key>255)
+                if (connection.Key>41)//255
                 {
                     Debug.Log("Connection Output Key bigger than 255");
                 }
@@ -85,7 +85,7 @@ public class NodeClass
         }
         else
         {
-            if (connectorTarget>255||connectorSource>255)
+            if (connectorTarget>41||connectorSource>41) //255
                 {
                     Debug.Log("Connection Target or Source bigger than 255");
                 }

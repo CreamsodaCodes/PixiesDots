@@ -4,7 +4,7 @@ using System;
 using UnityEngine;
 public class CreatureClass: EntityClass
 {
-    
+    System.Random random = new System.Random();
     public NodeClass[] allInternalNodes;
     public GenomeStruct[] brainGenomes;
      List<NodeClass> connectorNodes; 
@@ -27,9 +27,9 @@ public class CreatureClass: EntityClass
 
     public CreatureClass(int _xCord,int _yCord,GenomeStruct[] _brainGenomes): base( _xCord, _yCord){
         tag = 1;
-        globalInputs = new float[256];
+        globalInputs = new float[41];//256
         
-        globalOutputs = new float[256];
+        globalOutputs = new float[41];//256
         brainGenomes = new GenomeStruct[_brainGenomes.Length];
         int count = 0;
 
@@ -45,10 +45,10 @@ public class CreatureClass: EntityClass
     }
     public CreatureClass(int _xCord,int _yCord,bool random): base( _xCord, _yCord){
         tag = 1;
-        globalInputs = new float[256];
+        globalInputs = new float[41];
         
-        globalOutputs = new float[256];
-        GenomeStruct[] _brainGenomes = new GenomeStruct[5];
+        globalOutputs = new float[41];
+        GenomeStruct[] _brainGenomes = new GenomeStruct[7];
         int i = 0;
         foreach (GenomeStruct item in _brainGenomes)
         {
@@ -68,7 +68,7 @@ public class CreatureClass: EntityClass
 
 
     void brainBuilder(GenomeStruct[] brainGenomes){
-        allInternalNodes = new NodeClass[256];
+        allInternalNodes = new NodeClass[40];//256
         int run = 1;
         List<byte> validTargetIDs = new List<byte>();
         List<GenomeStruct> deleteThose = new List<GenomeStruct>();
@@ -182,6 +182,10 @@ public class CreatureClass: EntityClass
     public void completeThink(){
         inputManager();
         think();
+        
+
+    }
+    public void completeThink2(){
         moveDecicion();
         food -= brainGenomes.Count()+baseHunger;
         
@@ -189,15 +193,19 @@ public class CreatureClass: EntityClass
         {
             killMe();
         }
-
     }
 
+
     public override void killMe(){
-        isAlive = false;
-        field.gameboard[xCord,yCord] = null;
-        field.allCreatures.Remove(this);
-        field.CreatureCount--;
-        deleteVisual();
+        if (isAlive)
+        {
+            isAlive = false;
+            field.gameboard[xCord,yCord] = null;
+            field.allCreatures.Remove(this);
+            field.CreatureCount--;
+            deleteVisual();
+        }
+        
         
     }
 
@@ -222,11 +230,11 @@ public class CreatureClass: EntityClass
         field.gameboard[xCord,yCord].deleteVisual();
         food += 3000;
         field.plantCount--;
-        if (UnityEngine.Random.Range(0,5) == 0)
+        if (UnityEngine.Random.Range(0,30) == 0)
         {
             field.spawnCreatureMuated(brainGenomes);
         }
-        if (UnityEngine.Random.Range(0,5) == 0)
+        if (UnityEngine.Random.Range(0,30) == 0)
         {
             field.spawnCreature(brainGenomes);
         }
@@ -506,7 +514,8 @@ int clock = 0;
         globalInputs[35] = -1;
         globalInputs[36] = 11;
         globalInputs[37] = -11;
-        globalInputs[38] = UnityEngine.Random.Range(-1, 2);
+        
+        globalInputs[38] =(float) random.Next(-1, 2);
 
 
     }
@@ -517,7 +526,7 @@ public int GetMaxIndexFirst5()
     int maxIndex = 0;
     float maxValue = globalOutputs[0];
 
-    for (int i = 1; i < 9; i++)
+    for (int i = 1; i < 13; i++)
     {
         if (globalOutputs[i] > maxValue)
         {

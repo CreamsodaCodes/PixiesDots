@@ -4,7 +4,8 @@ using UnityEngine;
 using System;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
-
+using System.Threading.Tasks;
+// ohne multi 17fps //mit 32fps bei 4000 und bei 8000 immer noch 22fps
 public class field : MonoBehaviour
 {
     public static int Size = 1500;
@@ -16,7 +17,9 @@ public class field : MonoBehaviour
     public static int plantCount = 0;
     public static int plantWishCount = 7000;
     public static int CreatureCount = 0;
-    public static int CreatureWishCount = 4000;
+    public static int CreatureWishCount = 8000;
+    public static int CreatureWishCountSpawner = 8000;
+    public static int minimalCretaureCount = 1000;
 
     public static List<CreatureClass> allCreatures  = new List<CreatureClass>();
     
@@ -25,7 +28,7 @@ public class field : MonoBehaviour
 
     
     void keepCreaturesAtWish(){
-        if (CreatureCount<CreatureWishCount)
+        if (CreatureCount<CreatureWishCountSpawner)
         {
             spawnCreature();
         }
@@ -280,6 +283,10 @@ public class field : MonoBehaviour
     }
 
     private void Update() {
+        if (CreatureWishCountSpawner>minimalCretaureCount)
+        {
+            CreatureWishCountSpawner--;
+        }
         for (int i = 0; i < 60; i++)
         {
            keepPlantsAtWish();
@@ -300,11 +307,24 @@ public class field : MonoBehaviour
         }
         
         List<CreatureClass> allCreaturesCopy = new List<CreatureClass>(allCreatures);
+        
+        Parallel.ForEach(allCreaturesCopy, (Creature) =>
+        {
+            
+            if (Creature.isAlive)
+            {
+                Creature.completeThink();
+            }
+        });
+
+            
+            
+        
         foreach (CreatureClass Creature in allCreaturesCopy)
         {
             if (Creature.isAlive)
             {
-                Creature.completeThink();
+                Creature.completeThink2();
             }
             
         }
