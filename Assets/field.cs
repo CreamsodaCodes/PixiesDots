@@ -16,6 +16,7 @@ public class field : MonoBehaviour
     
     public static int plantCount = 0;
     public static int plantWishCount = 7000;
+    public static int maxPlantWishCount = 7000;
     public static int CreatureCount = 0;
     public static int CreatureWishCount = 8000;
     public static int CreatureWishCountSpawner = 8000;
@@ -283,9 +284,19 @@ public class field : MonoBehaviour
     }
 
     private void Update() {
+        if (CreatureCount>CreatureWishCount)
+        {
+            plantWishCount--;
+        }
         if (CreatureWishCountSpawner>minimalCretaureCount)
         {
             CreatureWishCountSpawner--;
+        }
+        if (CreatureCount == minimalCretaureCount)
+        {
+            CreatureWishCountSpawner = CreatureWishCount;
+            plantWishCount = maxPlantWishCount;
+
         }
         for (int i = 0; i < 60; i++)
         {

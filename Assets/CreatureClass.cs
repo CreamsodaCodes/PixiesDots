@@ -12,7 +12,7 @@ public class CreatureClass: EntityClass
      public float[] globalInputs;
      public float[] globalOutputs;
     //converted
-    int food = 4000;
+     int sizeFood;
     
     int baseHunger = 10;
     // new not yet mutation variables:
@@ -26,6 +26,7 @@ public class CreatureClass: EntityClass
     float memory1Value;
 
     public CreatureClass(int _xCord,int _yCord,GenomeStruct[] _brainGenomes): base( _xCord, _yCord){
+        food = 4000;
         tag = 1;
         globalInputs = new float[41];//256
         
@@ -40,10 +41,11 @@ public class CreatureClass: EntityClass
         }
         connectorNodes = new List<NodeClass>();
         brainBuilder(brainGenomes);
-        spawnVisual(xCord,yCord,brainGenomes[0].red,brainGenomes[0].green,brainGenomes[0].blue);
-        moveRight();
+        spawnVisual(xCord,yCord,brainGenomes[0].red,brainGenomes[0].green,brainGenomes[0].blue,brainGenomes[0].size);
+        sizeFood = Mathf.RoundToInt(100*brainGenomes[0].size); 
     }
     public CreatureClass(int _xCord,int _yCord,bool random): base( _xCord, _yCord){
+        food = 4000;
         tag = 1;
         globalInputs = new float[41];
         
@@ -58,8 +60,8 @@ public class CreatureClass: EntityClass
         connectorNodes = new List<NodeClass>();
         brainGenomes = _brainGenomes;
         brainBuilder(_brainGenomes);
-        spawnVisual(xCord,yCord,brainGenomes[0].red,brainGenomes[0].green,brainGenomes[0].blue);
-
+        spawnVisual(xCord,yCord,brainGenomes[0].red,brainGenomes[0].green,brainGenomes[0].blue,brainGenomes[0].size);
+        sizeFood = Mathf.RoundToInt(100*brainGenomes[0].size); 
     }
 
 
@@ -68,7 +70,7 @@ public class CreatureClass: EntityClass
 
 
     void brainBuilder(GenomeStruct[] brainGenomes){
-        allInternalNodes = new NodeClass[40];//256
+        allInternalNodes = new NodeClass[41];//256
         int run = 1;
         List<byte> validTargetIDs = new List<byte>();
         List<GenomeStruct> deleteThose = new List<GenomeStruct>();
@@ -187,7 +189,7 @@ public class CreatureClass: EntityClass
     }
     public void completeThink2(){
         moveDecicion();
-        food -= brainGenomes.Count()+baseHunger;
+        food -= brainGenomes.Count()+baseHunger+sizeFood;
         
         if (food<=0)
         {
@@ -230,25 +232,26 @@ public class CreatureClass: EntityClass
         field.gameboard[xCord,yCord].deleteVisual();
         food += 3000;
         field.plantCount--;
-        if (UnityEngine.Random.Range(0,30) == 0)
+       
+       /* if (UnityEngine.Random.Range(0,30) == 0)
         {
             field.spawnCreatureMuated(brainGenomes);
         }
         if (UnityEngine.Random.Range(0,30) == 0)
         {
             field.spawnCreature(brainGenomes);
-        }
+        }*/
         
     }
 
-    void eatCreature(int xCord,int yCord){
+    void eatCreature(int xCord,int yCord,int foodAmount){
         if (field.gameboard[xCord,yCord] == null)
         {
             return;
         }
         field.gameboard[xCord,yCord].deleteVisual();
         field.gameboard[xCord,yCord].killMe();
-        food += 2000;
+        food += foodAmount-10;
 
         
     }
@@ -266,9 +269,9 @@ public class CreatureClass: EntityClass
         int check = checkField(xCord-1,yCord);
         if (check == 1)
         {
-            if (isInEatMode)
+            if (field.gameboard[xCord-1,yCord].spawnedPrefab!=null&&UnityEngine.Random.Range(0, spawnedPrefab.transform.localScale.magnitude)>=UnityEngine.Random.Range(0, field.gameboard[xCord-1,yCord].spawnedPrefab.transform.localScale.magnitude))
             {
-                eatCreature(xCord-1,yCord);
+                eatCreature(xCord-1,yCord,field.gameboard[xCord-1,yCord].food);
             }
             else
             {
@@ -293,9 +296,10 @@ public class CreatureClass: EntityClass
         int check = checkField(xCord+1,yCord);
         if (check == 1)
         {
-            if (isInEatMode)
+
+            if (field.gameboard[xCord+1,yCord].spawnedPrefab!=null&&UnityEngine.Random.Range(0, spawnedPrefab.transform.localScale.magnitude)>=UnityEngine.Random.Range(0, field.gameboard[xCord+1,yCord].spawnedPrefab.transform.localScale.magnitude))
             {
-                eatCreature(xCord+1,yCord);
+                eatCreature(xCord+1,yCord,field.gameboard[xCord+1,yCord].food);
             }
             else
             {
@@ -320,9 +324,9 @@ public class CreatureClass: EntityClass
         int check = checkField(xCord,yCord+1);
         if (check == 1)
         {
-            if (isInEatMode)
+            if (field.gameboard[xCord,yCord+1].spawnedPrefab!=null&&UnityEngine.Random.Range(0, spawnedPrefab.transform.localScale.magnitude)>=UnityEngine.Random.Range(0, field.gameboard[xCord,yCord+1].spawnedPrefab.transform.localScale.magnitude))
             {
-                eatCreature(xCord,yCord+1);
+                eatCreature(xCord,yCord+1,field.gameboard[xCord,yCord+1].food);
             }
             else
             {
@@ -346,9 +350,9 @@ public class CreatureClass: EntityClass
         int check = checkField(xCord,yCord-1);
         if (check == 1)
         {
-            if (isInEatMode)
+            if (field.gameboard[xCord,yCord-1].spawnedPrefab!=null&&UnityEngine.Random.Range(0, spawnedPrefab.transform.localScale.magnitude)>=UnityEngine.Random.Range(0, field.gameboard[xCord,yCord-1].spawnedPrefab.transform.localScale.magnitude))
             {
-                eatCreature(xCord,yCord-1);
+                eatCreature(xCord,yCord-1,field.gameboard[xCord,yCord-1].food);
             }
             else
             {
@@ -388,7 +392,7 @@ public class CreatureClass: EntityClass
         if(food<4001){
             return;
         }
-        food -= 3000;
+        food -= 4000;
         
         field.spawnCreatureMuatedNear(brainGenomes,xCord,yCord);
 

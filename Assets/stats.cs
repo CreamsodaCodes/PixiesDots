@@ -6,7 +6,7 @@ public class stats : MonoBehaviour
 {
     
     public int creatercountCopy;
-    
+    public int plantCountCopy;
     void Start()
     {
        InvokeRepeating("UpdateSettings", 1f, 1f); 
@@ -15,5 +15,6 @@ public class stats : MonoBehaviour
     void UpdateSettings()
     {
         creatercountCopy = field.CreatureCount;
+        plantCountCopy = field.plantCount;
     }
 }

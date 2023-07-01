@@ -18,9 +18,9 @@ public struct GenomeStruct
     int inputAmount; //40; //256
     int outputAmount;
     public int WhatFunction;
-    
+    public float size;
     // Struct constructor
-    public GenomeStruct(bool source, bool sink, byte sourceId, byte targetId, float weight, float bias,float r,float g,float b,int whatFunctio)
+    public GenomeStruct(bool source, bool sink, byte sourceId, byte targetId, float weight, float bias,float r,float g,float b,int whatFunctio,float size)
     {
         this.inputAmount = 40;
         this.outputAmount = 40;
@@ -34,6 +34,7 @@ public struct GenomeStruct
         this.blue = b;
         this.green = g;
         this.WhatFunction = whatFunctio;
+        this.size = size;
     }
 
     public GenomeStruct(bool genRandom)
@@ -50,23 +51,13 @@ public struct GenomeStruct
         green = (float)random.NextDouble();
         blue = (float)random.NextDouble();
         WhatFunction = random.Next(6);
-
+        size = (float)random.NextDouble()*0.08f+0.1f;
     }
     public GenomeStruct CloneMe(){
-        return new GenomeStruct(source,sink,sourceId,targetId,weight,bias,red,green,blue,WhatFunction);
+        return new GenomeStruct(source,sink,sourceId,targetId,weight,bias,red,green,blue,WhatFunction,size);
     }
 
-    public void randomGen(){
-        
-
-        source = random.Next(2) == 0;
-        sink = random.Next(2) == 0;
-        sourceId = (byte)random.Next(outputAmount);
-        targetId = (byte)random.Next(outputAmount);
-        
-        weight =(float) (random.NextDouble() * 7.0 - 3.5);
-        bias  = (float)((random.NextDouble() * 0.02) - 0.01);
-    }
+    
 
     public void mutateMe(){
         int mutator = random.Next(101);
@@ -146,6 +137,14 @@ public struct GenomeStruct
            {
             WhatFunction += rnumber;
            }
+        }
+        if (65<mutator&&mutator<75)
+        {
+            float sizeAddition = (float)random.NextDouble()*0.5f-0.025f;
+            if (sizeAddition+size<0.18&&sizeAddition+size>0.1)
+            {
+                size += sizeAddition;
+            }
         }
     }
 }

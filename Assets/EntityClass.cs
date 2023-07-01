@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class EntityClass
 {
+    public int food;
     public EntityClass(int _xCord,int _yCord){
         xCord = _xCord;
         yCord = _yCord;
@@ -38,11 +39,12 @@ public class EntityClass
 
     public string visualName = "CreatureVisual";
     public GameObject spawnedPrefab;
-    public void spawnVisual(int xCord,int yCord,float r,float g,float b){
+    public void spawnVisual(int xCord,int yCord,float r,float g,float b,float size){
         GameObject prefab = Resources.Load<GameObject>(visualName);
         Vector3 spawnPoint = new Vector3(xCord, yCord, 1);
         spawnedPrefab = GameObject.Instantiate(prefab, spawnPoint, Quaternion.identity);
         spawnedPrefab.GetComponent<SpriteRenderer>().color = new Color(r, g, b, 1);
+        spawnedPrefab.transform.localScale = new Vector3(size, size, size);
     }
     public void spawnVisual(int xCord,int yCord){
         GameObject prefab = Resources.Load<GameObject>(visualName);
@@ -65,7 +67,7 @@ public class EntityClass
     public virtual void killMe(){}
 
     public void grow(){
-    spawnedPrefab.transform.localScale = new Vector3(2f, 2f, 1f);    }
+    spawnedPrefab.transform.localScale = spawnedPrefab.transform.localScale*2f;    }
     public void shrink(){
-    spawnedPrefab.transform.localScale = new Vector3(0.9f, 0.9f, 1f);    }
+    spawnedPrefab.transform.localScale = spawnedPrefab.transform.localScale*0.5f;    }
 }
