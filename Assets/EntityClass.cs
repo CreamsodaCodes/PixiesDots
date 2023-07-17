@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class EntityClass
 {
+    public double redness; 
     public int food;
     public EntityClass(int _xCord,int _yCord){
         xCord = _xCord;
@@ -15,7 +16,7 @@ public class EntityClass
     public  int xCord;
     public int yCord;
     public bool isAlive = true;
-
+    public int sizeFood; //converted size
      public int XCord
     {
         get { return xCord; }

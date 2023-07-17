@@ -12,9 +12,9 @@ public class CreatureClass: EntityClass
      public float[] globalInputs;
      public float[] globalOutputs;
     //converted
-     int sizeFood;
+     
     
-    int baseHunger = 10;
+    int baseHunger = 1;//10
     // new not yet mutation variables:
     int visionLength = 12;
     int noseQuality = 7;
@@ -26,11 +26,12 @@ public class CreatureClass: EntityClass
     float memory1Value;
 
     public CreatureClass(int _xCord,int _yCord,GenomeStruct[] _brainGenomes): base( _xCord, _yCord){
+        
         food = 4000;
         tag = 1;
-        globalInputs = new float[41];//256
+        globalInputs = new float[47];//256
         
-        globalOutputs = new float[41];//256
+        globalOutputs = new float[47];//256
         brainGenomes = new GenomeStruct[_brainGenomes.Length];
         int count = 0;
 
@@ -42,14 +43,16 @@ public class CreatureClass: EntityClass
         connectorNodes = new List<NodeClass>();
         brainBuilder(brainGenomes);
         spawnVisual(xCord,yCord,brainGenomes[0].red,brainGenomes[0].green,brainGenomes[0].blue,brainGenomes[0].size);
-        sizeFood = Mathf.RoundToInt(100*brainGenomes[0].size); 
+        sizeFood = Mathf.RoundToInt(100*brainGenomes[0].size); //Value between 10/18//36
+        redness = brainGenomes[0].red;
     }
     public CreatureClass(int _xCord,int _yCord,bool random): base( _xCord, _yCord){
+        
         food = 4000;
         tag = 1;
-        globalInputs = new float[41];
+        globalInputs = new float[47];
         
-        globalOutputs = new float[41];
+        globalOutputs = new float[47];
         GenomeStruct[] _brainGenomes = new GenomeStruct[7];
         int i = 0;
         foreach (GenomeStruct item in _brainGenomes)
@@ -62,6 +65,7 @@ public class CreatureClass: EntityClass
         brainBuilder(_brainGenomes);
         spawnVisual(xCord,yCord,brainGenomes[0].red,brainGenomes[0].green,brainGenomes[0].blue,brainGenomes[0].size);
         sizeFood = Mathf.RoundToInt(100*brainGenomes[0].size); 
+        redness = brainGenomes[0].red;
     }
 
 
@@ -70,7 +74,7 @@ public class CreatureClass: EntityClass
 
 
     void brainBuilder(GenomeStruct[] brainGenomes){
-        allInternalNodes = new NodeClass[41];//256
+        allInternalNodes = new NodeClass[47];//256
         int run = 1;
         List<byte> validTargetIDs = new List<byte>();
         List<GenomeStruct> deleteThose = new List<GenomeStruct>();
@@ -297,7 +301,7 @@ public class CreatureClass: EntityClass
         if (check == 1)
         {
 
-            if (field.gameboard[xCord+1,yCord].spawnedPrefab!=null&&UnityEngine.Random.Range(0, spawnedPrefab.transform.localScale.magnitude)>=UnityEngine.Random.Range(0, field.gameboard[xCord+1,yCord].spawnedPrefab.transform.localScale.magnitude))
+            if (field.gameboard[xCord+1,yCord].spawnedPrefab!=null&&UnityEngine.Random.Range(0, spawnedPrefab.transform.localScale.magnitude)>=UnityEngine.Random.Range(0, field.gameboard[xCord+1,yCord].spawnedPrefab.transform.localScale.magnitude)&&brainGenomes[0].red>0.7)
             {
                 eatCreature(xCord+1,yCord,field.gameboard[xCord+1,yCord].food);
             }
@@ -520,7 +524,14 @@ int clock = 0;
         globalInputs[37] = -11;
         
         globalInputs[38] =(float) random.Next(-1, 2);
-
+        globalInputs[39] = VisualCortex.GetLineFieldsANDSize(xCord,yCord,visionLength*4,1,1); //creatures north
+        globalInputs[40] = VisualCortex.GetLineFieldsANDSize(xCord,yCord,visionLength*4,1,2); //creatures easr
+        globalInputs[41] = VisualCortex.GetLineFieldsANDSize(xCord,yCord,visionLength*4,1,3); //creatures south
+        globalInputs[42] = VisualCortex.GetLineFieldsANDSize(xCord,yCord,visionLength*4,1,4);
+        globalInputs[43] = VisualCortex.GetLineFieldsANDSize(xCord,yCord,visionLength*4,1,1); //creatures north
+        globalInputs[44] = VisualCortex.GetLineFieldsANDSize(xCord,yCord,visionLength*4,1,2); //creatures easr
+        globalInputs[45] = VisualCortex.GetLineFieldsANDSize(xCord,yCord,visionLength*4,1,3); //creatures south
+        globalInputs[46] = VisualCortex.GetLineFieldsANDSize(xCord,yCord,visionLength*4,1,4);
 
     }
 
