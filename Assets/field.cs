@@ -51,7 +51,7 @@ public class field : MonoBehaviour
         }
     }
 
-        public static void spawnCreature(GenomeStruct[] DNA){
+        public static void spawnCreature(GenomeStruct[] DNA,int _speciesCounter){
         if (CreatureCount>CreatureWishCount+2000)
         {
             return;
@@ -61,14 +61,14 @@ public class field : MonoBehaviour
         if (checkField(rX,rY)==0)
         {
             CreatureCount++;
-            CreatureClass a = new CreatureClass(rX,rY,DNA);
+            CreatureClass a = new CreatureClass(rX,rY,DNA,_speciesCounter);
             gameboard[rX,rY] = a;
             allCreatures.Add(a);
             return;
         }
     } 
 
-    public static void spawnCreatureMuated(GenomeStruct[] DNA){
+    public static void spawnCreatureMuated(GenomeStruct[] DNA,int _speciesCounter){
         if (CreatureCount>CreatureWishCount+1000)
         {
             return;
@@ -139,7 +139,7 @@ public class field : MonoBehaviour
         if (checkField(rX,rY)==0)
         {
             CreatureCount++;
-            CreatureClass a = new CreatureClass(rX,rY,DNACopy);
+            CreatureClass a = new CreatureClass(rX,rY,DNACopy,_speciesCounter);
             gameboard[rX,rY] = a;
             allCreatures.Add(a);
             
@@ -150,7 +150,7 @@ public class field : MonoBehaviour
         if (checkField(rY,rX)==0)
         {
             CreatureCount++;
-            CreatureClass a = new CreatureClass(rY,rX,DNACopy2);
+            CreatureClass a = new CreatureClass(rY,rX,DNACopy2,_speciesCounter);
             gameboard[rY,rX] = a;
             allCreatures.Add(a);
             
@@ -160,7 +160,7 @@ public class field : MonoBehaviour
         
     }
 
-    public static void spawnCreatureMuatedNear(GenomeStruct[] DNA, int xCord,int yCord){
+    public static void spawnCreatureMuatedNear(GenomeStruct[] DNA, int xCord,int yCord,int _speciesCounter){
         if (CreatureCount>CreatureWishCount+1100)
         {
             return;
@@ -231,7 +231,7 @@ public class field : MonoBehaviour
         if (xCord+rX<Size&&yCord+rY<Size&&checkField(rX+xCord,rY+yCord)==0)
         {
             CreatureCount++;
-            CreatureClass a = new CreatureClass(xCord+rX,yCord+rY,DNACopy);
+            CreatureClass a = new CreatureClass(xCord+rX,yCord+rY,DNACopy,_speciesCounter);
             gameboard[rX,rY] = a;
             allCreatures.Add(a);
             
@@ -242,7 +242,7 @@ public class field : MonoBehaviour
         if (xCord+rX<Size&&yCord+rY<Size&&checkField(rY+yCord,rX+xCord)==0)
         {
             CreatureCount++;
-            CreatureClass a = new CreatureClass(yCord+rY,xCord+rX,DNACopy2);
+            CreatureClass a = new CreatureClass(yCord+rY,xCord+rX,DNACopy2,_speciesCounter);
             gameboard[rY,rX] = a;
             allCreatures.Add(a);
             
@@ -347,6 +347,8 @@ public class field : MonoBehaviour
     public void autoSafeAllCreatures(){
         List<CreatureClass> allCreaturesCopy = new List<CreatureClass>(allCreatures);
         GenomeStruct[][] allCreaturesSafed = new GenomeStruct[allCreaturesCopy.Count][];
+        int[] allCreaturesSavedSpeciesCounter = new int[allCreaturesCopy.Count];
+
         BinaryFormatter formatter = new BinaryFormatter();
         int count2 = 0;
         
@@ -360,23 +362,40 @@ public class field : MonoBehaviour
             
                 formatter.Serialize(stream, allCreaturesSafed);
         }
+        using (FileStream stream = new FileStream("autoSafeSpeciesCounter.dat", FileMode.Create))
+        {
+            
+                formatter.Serialize(stream, allCreaturesSavedSpeciesCounter);
+                
+        }
     }
     public void safeAllCreatures(){
         List<CreatureClass> allCreaturesCopy = new List<CreatureClass>(allCreatures);
         GenomeStruct[][] allCreaturesSafed = new GenomeStruct[allCreaturesCopy.Count][];
+        int[] allCreaturesSavedSpeciesCounter = new int[allCreaturesCopy.Count];
         BinaryFormatter formatter = new BinaryFormatter();
         int count2 = 0;
         
         foreach (CreatureClass cre in allCreaturesCopy)
             {
                 allCreaturesSafed[count2] = cre.brainGenomes;
+                allCreaturesSavedSpeciesCounter[count2] = cre.speciesCounter;
                 count2++;
             }
         using (FileStream stream = new FileStream("genArrayCopy.dat", FileMode.Create))
         {
             
                 formatter.Serialize(stream, allCreaturesSafed);
+                
         }
+        using (FileStream stream = new FileStream("genArrayCopySpeciesCounter.dat", FileMode.Create))
+        {
+            
+                formatter.Serialize(stream, allCreaturesSavedSpeciesCounter);
+                
+        }
+        
+        
             
             
         
@@ -384,7 +403,9 @@ public class field : MonoBehaviour
 
     public void loadAllCreaturesFromSafe(){
         string fileName = "genArrayCopy.dat";
+        string fileName2 = "genArrayCopySpeciesCounter.dat";
         GenomeStruct[][] loadedArray;
+        int[] loadedArray2;
     // Check if the file exists before attempting to load it
     if (File.Exists(fileName))
     {
@@ -401,9 +422,20 @@ public class field : MonoBehaviour
             // Use the loaded data as needed
             // ...
         }
+        using (FileStream stream = new FileStream(fileName2, FileMode.Open))
+        {
+            
+            // Deserialize the data and cast it back to the appropriate type
+            loadedArray2 = (int[])formatter.Deserialize(stream);
+
+            // Use the loaded data as needed
+            // ...
+        }
+        int q = 0;
         foreach (GenomeStruct[] RNA in loadedArray)
         {
-            spawnCreature(RNA);
+            spawnCreature(RNA,loadedArray2[q]);
+            q++;
         }
 
     }}

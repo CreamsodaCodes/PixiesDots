@@ -5,11 +5,17 @@ using UnityEngine;
 
 public class EntityClass
 {
+    public int speciesCounter;
     public double redness; 
     public int food;
     public EntityClass(int _xCord,int _yCord){
         xCord = _xCord;
         yCord = _yCord;
+    }
+    public EntityClass(int _xCord,int _yCord,int _speciesCounter){
+        xCord = _xCord;
+        yCord = _yCord;
+        speciesCounter = _speciesCounter;
     }
     public int tag;
     public bool enabled = true; 
@@ -46,7 +52,8 @@ public class EntityClass
         spawnedPrefab = GameObject.Instantiate(prefab, spawnPoint, Quaternion.identity);
         spawnedPrefab.GetComponent<SpriteRenderer>().color = new Color(r, g, b, 1);
         spawnedPrefab.transform.localScale = new Vector3(size, size, size);
-    }
+        spawnedPrefab.GetComponent<CreatureData>().SpeciesCount = speciesCounter;
+    }   
     public void spawnVisual(int xCord,int yCord){
         GameObject prefab = Resources.Load<GameObject>(visualName);
         Vector3 spawnPoint = new Vector3(xCord, yCord, 1);

@@ -25,13 +25,13 @@ public class CreatureClass: EntityClass
     int memory1Adress;
     float memory1Value;
 
-    public CreatureClass(int _xCord,int _yCord,GenomeStruct[] _brainGenomes): base( _xCord, _yCord){
-        
+    public CreatureClass(int _xCord,int _yCord,GenomeStruct[] _brainGenomes,int _speciesCounter): base( _xCord, _yCord,_speciesCounter){
+        speciesCounter = _speciesCounter;
         food = 4000;
         tag = 1;
-        globalInputs = new float[47];//256
+        globalInputs = new float[100];//256
         
-        globalOutputs = new float[47];//256
+        globalOutputs = new float[100];//256
         brainGenomes = new GenomeStruct[_brainGenomes.Length];
         int count = 0;
 
@@ -47,12 +47,12 @@ public class CreatureClass: EntityClass
         redness = brainGenomes[0].red;
     }
     public CreatureClass(int _xCord,int _yCord,bool random): base( _xCord, _yCord){
-        
+        speciesCounter = UnityEngine.Random.Range(0, 30000);
         food = 4000;
         tag = 1;
-        globalInputs = new float[47];
+        globalInputs = new float[100];
         
-        globalOutputs = new float[47];
+        globalOutputs = new float[100];
         GenomeStruct[] _brainGenomes = new GenomeStruct[7];
         int i = 0;
         foreach (GenomeStruct item in _brainGenomes)
@@ -74,7 +74,7 @@ public class CreatureClass: EntityClass
 
 
     void brainBuilder(GenomeStruct[] brainGenomes){
-        allInternalNodes = new NodeClass[47];//256
+        allInternalNodes = new NodeClass[100];//256
         int run = 1;
         List<byte> validTargetIDs = new List<byte>();
         List<GenomeStruct> deleteThose = new List<GenomeStruct>();
@@ -397,8 +397,14 @@ public class CreatureClass: EntityClass
             return;
         }
         food -= 4000;
+        if (random.Next(0, 2)==0)
+        {
+            field.spawnCreatureMuatedNear(brainGenomes,xCord,yCord,speciesCounter+1);
+        }
+        else{
+            field.spawnCreatureMuatedNear(brainGenomes,xCord,yCord,speciesCounter-1);
+        }
         
-        field.spawnCreatureMuatedNear(brainGenomes,xCord,yCord);
 
     }
 
@@ -528,10 +534,14 @@ int clock = 0;
         globalInputs[40] = VisualCortex.GetLineFieldsANDSize(xCord,yCord,visionLength*4,1,2); //creatures easr
         globalInputs[41] = VisualCortex.GetLineFieldsANDSize(xCord,yCord,visionLength*4,1,3); //creatures south
         globalInputs[42] = VisualCortex.GetLineFieldsANDSize(xCord,yCord,visionLength*4,1,4);
-        globalInputs[43] = VisualCortex.GetLineFieldsANDSize(xCord,yCord,visionLength*4,1,1); //creatures north
-        globalInputs[44] = VisualCortex.GetLineFieldsANDSize(xCord,yCord,visionLength*4,1,2); //creatures easr
-        globalInputs[45] = VisualCortex.GetLineFieldsANDSize(xCord,yCord,visionLength*4,1,3); //creatures south
-        globalInputs[46] = VisualCortex.GetLineFieldsANDSize(xCord,yCord,visionLength*4,1,4);
+        globalInputs[43] = VisualCortex.GetLineFieldsANDRed(xCord,yCord,visionLength*4,1,1); //creatures north
+        globalInputs[44] = VisualCortex.GetLineFieldsANDRed(xCord,yCord,visionLength*4,1,2); //creatures easr
+        globalInputs[45] = VisualCortex.GetLineFieldsANDRed(xCord,yCord,visionLength*4,1,3); //creatures south
+        globalInputs[46] = VisualCortex.GetLineFieldsANDRed(xCord,yCord,visionLength*4,1,4);
+        globalInputs[47] = VisualCortex.GetLineFieldsANDSpecification(xCord,yCord,visionLength*4,1,1,speciesCounter); //creatures north
+        globalInputs[48] = VisualCortex.GetLineFieldsANDSpecification(xCord,yCord,visionLength*4,1,2,speciesCounter); //creatures easr
+        globalInputs[49] = VisualCortex.GetLineFieldsANDSpecification(xCord,yCord,visionLength*4,1,3,speciesCounter); //creatures south
+        globalInputs[50] = VisualCortex.GetLineFieldsANDSpecification(xCord,yCord,visionLength*4,1,4,speciesCounter);
 
     }
 

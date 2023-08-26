@@ -22,8 +22,8 @@ public struct GenomeStruct
     // Struct constructor
     public GenomeStruct(bool source, bool sink, byte sourceId, byte targetId, float weight, float bias,float r,float g,float b,int whatFunctio,float size)
     {
-        this.inputAmount = 46;
-        this.outputAmount = 46;
+        this.inputAmount = 99;
+        this.outputAmount = 99;
         this.source = source;
         this.sink = sink;
         this.sourceId = sourceId;
@@ -39,8 +39,8 @@ public struct GenomeStruct
 
     public GenomeStruct(bool genRandom)
     {
-        this.inputAmount = 46;
-         this.outputAmount = 46;
+        this.inputAmount = 99;
+         this.outputAmount = 99;
         source = random.Next(2) == 0;
         sink = random.Next(2) == 0;
         sourceId = (byte)random.Next(outputAmount);
